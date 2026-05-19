@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexCore - Supply Chain Intelligence Demo</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        header {
+            background: linear-gradient(135deg, #1F4E78 0%, #2E5C8A 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .nav-tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: #f9f9f9;
+        }
+        .nav-tabs button {
+            flex: 1;
+            padding: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+        .nav-tabs button.active {
+            color: #1F4E78;
+            border-bottom-color: #E74C3C;
+        }
+        .tab-content {
+            padding: 40px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .demo-section h2 {
+            color: #1F4E78;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .search-box button {
+            padding: 12px 30px;
+            background: #E74C3C;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .search-box button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        .card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #E74C3C;
+        }
+        .component-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .component-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1F4E78;
+        }
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status.in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .component-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 12px;
+        }
+        .detail-item {
+            font-size: 13px;
+            color: #666;
+        }
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .supplier-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 2px solid #2E5C8A;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .supplier-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(31, 78, 120, 0.2);
+        }
+        .supplier-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1F4E78;
+            margin-bottom: 8px;
+        }
+        .supplier-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        .supplier-metric {
+            font-size: 13px;
+            color: #555;
+        }
+        .supplier-metric strong {
+            color: #1F4E78;
+        }
+        .select-btn {
+            width: 100%;
+            padding: 10px;
+            background: #E74C3C;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .select-btn:hover {
+            background: #c0392b;
+        }
+        .alert {
+            background: #fff3cd;
+            border-left: 4px solid #E74C3C;
+            padding: 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        .alert-icon {
+            font-size: 24px;
+        }
+        .alert-content {
+            flex: 1;
+        }
+        .alert-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        .alert-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        .manufacturer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .manufacturer-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .manufacturer-card:hover {
+            border-color: #E74C3C;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+        .manufacturer-name {
+            font-weight: 700;
+            font-size: 16px;
+            color: #1F4E78;
+            margin-bottom: 12px;
+        }
+        .manufacturer-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .stat-label {
+            color: #666;
+        }
+        .stat-value {
+            font-weight: 600;
+            color: #1F4E78;
+        }
+        .quote-btn {
+            width: 100%;
+            padding: 10px;
+            background: #2E5C8A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 12px;
+            transition: all 0.3s;
+        }
+        .quote-btn:hover {
+            background: #1F4E78;
+        }
+        .footer {
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            padding: 20px 40px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #e8f4f8;
+            color: #2E5C8A;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        function NexCoreDemo() {
+            const [activeTab, setActiveTab] = React.useState('visibility');
+            const [searchQuery, setSearchQuery] = React.useState('HBM Memory');
+            const [selectedSupplier, setSelectedSupplier] = React.useState(null);
+
+            const components = [
+                { id: 1, name: 'HBM Memory (NVIDIA H100)', status: 'low-stock', suppliers: 3, leadTime: '12 weeks', price: '$450-520' },
+                { id: 2, name: 'TSMC Advanced Packaging', status: 'out-of-stock', suppliers: 2, leadTime: 'TBD', price: 'Quote' },
+                { id: 3, name: 'CAN Bus Controller (NXP)', status: 'in-stock', suppliers: 5, leadTime: '2 weeks', price: '$28-32' },
+                { id: 4, name: 'BMS Battery IC (TI)', status: 'in-stock', suppliers: 4, leadTime: '1 week', price: '$15-18' }
+            ];
+
+            const suppliers = {
+                'HBM Memory (NVIDIA H100)': [
+                    { name: 'SK Hynix (China)', price: '$480', lead: '10 weeks', quality: '★★★★★', compliance: 'ITAR Compliant', selected: false },
+                    { name: 'Micron (Taiwan)', price: '$510', lead: '12 weeks', quality: '★★★★★', compliance: 'ITAR Compliant', selected: false },
+                    { name: 'Samsung Electronics', price: '$520', lead: '14 weeks', quality: '★★★★', compliance: 'ITAR Compliant', selected: false }
+                ]
+            };
+
+            const manufacturers = [
+                { name: 'Flex Electronics (Ahmedabad)', turnaround: '3 days', capacity: '500k units/mo', quality: '98.5%', quote: 'Get Quote' },
+                { name: 'Wistron (Bangalore)', turnaround: '5 days', capacity: '300k units/mo', quality: '97.8%', quote: 'Get Quote' },
+                { name: 'Jaco Electronics', turnaround: '2 days', capacity: '150k units/mo', quality: '99.2%', quote: 'Get Quote' }
+            ];
+
+            const riskAlerts = [
+                { icon: '⚠️', title: 'HBM Memory Bottleneck', desc: 'TSMC advanced packaging booked through Q2 2026. Recommend sourcing alternatives from SK Hynix.' },
+                { icon: '🌍', title: 'Export Control Alert', desc: 'New ITAR restrictions on high-bandwidth memory. Verify compliance before shipment to customers.' }
+            ];
+
+            return (
+                <div className="container">
+                    <header>
+                        <h1>NEXCORE</h1>
+                        <p>Supply Chain Intelligence & Hardware Iteration Platform</p>
+                    </header>
+
+                    <div className="nav-tabs">
+                        <button 
+                            className={activeTab === 'visibility' ? 'active' : ''}
+                            onClick={() => setActiveTab('visibility')}
+                        >
+                            📊 Real-Time Visibility
+                        </button>
+                        <button 
+                            className={activeTab === 'matching' ? 'active' : ''}
+                            onClick={() => setActiveTab('matching')}
+                        >
+                            🤖 AI Supplier Matching
+                        </button>
+                        <button 
+                            className={activeTab === 'iteration' ? 'active' : ''}
+                            onClick={() => setActiveTab('iteration')}
+                        >
+                            ⚡ Hardware Iteration
+                        </button>
+                        <button 
+                            className={activeTab === 'risks' ? 'active' : ''}
+                            onClick={() => setActiveTab('risks')}
+                        >
+                            🚨 Risk Monitoring
+                        </button>
+                    </div>
+
+                    <div className="tab-content">
+                        {activeTab === 'visibility' && (
+                            <div className="demo-section">
+                                <h2>Real-Time Component Availability Dashboard</h2>
+                                <p style={{marginBottom: '20px', color: '#666'}}>Live tracking of component inventory, lead times, and pricing across your suppliers</p>
+                                
+                                <div className="search-box">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search component..." 
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <button>Search</button>
+                                </div>
+
+                                {components.map(comp => (
+                                    <div key={comp.id} className="card">
+                                        <div className="component-header">
+                                            <div className="component-name">{comp.name}</div>
+                                            <div className={`status ${comp.status}`}>
+                                                {comp.status === 'in-stock' ? '✓ In Stock' : comp.status === 'low-stock' ? '⚠ Low Stock' : '✗ Out of Stock'}
+                                            </div>
+                                        </div>
+                                        <div className="component-details">
+                                            <div className="detail-item">
+                                                <div className="detail-label">Lead Time</div>
+                                                <div>{comp.leadTime}</div>
+                                            </div>
+                                            <div className="detail-item">
+                                                <div className="detail-label">Price Range</div>
+                                                <div>{comp.price}</div>
+                                            </div>
+                                            <div className="detail-item">
+                                                <div className="detail-label">Available Suppliers</div>
+                                                <div>{comp.suppliers} verified suppliers</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {activeTab === 'matching' && (
+                            <div className="demo-section">
+                                <h2>AI-Powered Supplier Matching</h2>
+                                <p style={{marginBottom: '20px', color: '#666'}}>When your primary supplier is unavailable, NexCore recommends verified alternatives</p>
+                                
+                                <div className="search-box">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search for component..." 
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                    />
+                                    <button>Find Alternatives</button>
+                                </div>
+
+                                <div style={{marginBottom: '20px'}}>
+                                    <span className="badge">AI Evaluated</span>
+                                    <span className="badge">Price Optimized</span>
+                                    <span className="badge">Compliance Verified</span>
+                                </div>
+
+                                {(suppliers[searchQuery] || suppliers['HBM Memory (NVIDIA H100)']).map((supplier, idx) => (
+                                    <div key={idx} className="supplier-card">
+                                        <div className="supplier-name">{supplier.name}</div>
+                                        <div className="supplier-info">
+                                            <div className="supplier-metric"><strong>Price:</strong> {supplier.price}</div>
+                                            <div className="supplier-metric"><strong>Lead Time:</strong> {supplier.lead}</div>
+                                            <div className="supplier-metric"><strong>Quality:</strong> {supplier.quality}</div>
+                                            <div className="supplier-metric"><strong>Compliance:</strong> {supplier.compliance}</div>
+                                        </div>
+                                        <button className="select-btn" onClick={() => setSelectedSupplier(supplier.name)}>
+                                            {selectedSupplier === supplier.name ? '✓ Selected' : 'Select Supplier'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {activeTab === 'iteration' && (
+                            <div className="demo-section">
+                                <h2>Hardware Iteration Marketplace</h2>
+                                <p style={{marginBottom: '30px', color: '#666'}}>Connect with verified manufacturers for rapid prototyping and production</p>
+                                
+                                <div className="manufacturer-grid">
+                                    {manufacturers.map((mfg, idx) => (
+                                        <div key={idx} className="manufacturer-card">
+                                            <div className="manufacturer-name">{mfg.name}</div>
+                                            <div className="manufacturer-stat">
+                                                <span className="stat-label">Turnaround</span>
+                                                <span className="stat-value">{mfg.turnaround}</span>
+                                            </div>
+                                            <div className="manufacturer-stat">
+                                                <span className="stat-label">Capacity</span>
+                                                <span className="stat-value">{mfg.capacity}</span>
+                                            </div>
+                                            <div className="manufacturer-stat">
+                                                <span className="stat-label">Quality Score</span>
+                                                <span className="stat-value">{mfg.quality}</span>
+                                            </div>
+                                            <button className="quote-btn">Request Quote</button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'risks' && (
+                            <div className="demo-section">
+                                <h2>Risk & Compliance Monitoring</h2>
+                                <p style={{marginBottom: '20px', color: '#666'}}>Automated alerts for supply chain risks, geopolitical issues, and export compliance</p>
+                                
+                                {riskAlerts.map((alert, idx) => (
+                                    <div key={idx} className="alert">
+                                        <div className="alert-icon">{alert.icon}</div>
+                                        <div className="alert-content">
+                                            <div className="alert-title">{alert.title}</div>
+                                            <div className="alert-desc">{alert.desc}</div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                <div className="card" style={{marginTop: '20px'}}>
+                                    <h3 style={{color: '#1F4E78', marginBottom: '16px'}}>Compliance Checklist</h3>
+                                    <div style={{fontSize: '13px', color: '#666'}}>
+                                        <div style={{marginBottom: '12px'}}>✓ ITAR Compliance: <strong>All suppliers verified</strong></div>
+                                        <div style={{marginBottom: '12px'}}>✓ EAR Restrictions: <strong>No violations detected</strong></div>
+                                        <div style={{marginBottom: '12px'}}>⚠ China Sourcing: <strong>3 components on restricted list</strong></div>
+                                        <div>✓ Quality Certifications: <strong>ISO 9001 verified</strong></div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="footer">
+                        <strong>NexCore Demo</strong> — This is a functional demo showing core features. Live with real supplier data coming soon. 
+                        <br/>
+                        Contact: shlok@mirai.in | Y Combinator Summer 2026
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<NexCoreDemo />);
+    </script>
+</body>
+</html>
